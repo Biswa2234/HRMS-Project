@@ -1,16 +1,45 @@
 import express from "express";
-import prisma from "../config/database.js";
-import asyncHandler from "./asyncHandler.js";
+import cors from "cors";
+
+import { prisma } from "./config/database.js";
+import asyncHandler from "./utils/asyncHandler.js";
+import authRoutes from "./routes/auth.routes.js";
+import userRoutes from "./routes/user.routes.js";
 
 const app = express();
 
 /**
+ * =========================
+ * CORS
+ * =========================
+ */
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
+
+/**
+ * =========================
  * Global Middleware
+ * =========================
  */
 app.use(express.json());
 
 /**
+ * =========================
+ * Auth Routes
+ * =========================
+ */
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+
+/**
+ * =========================
  * Root
+ * =========================
  */
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -20,7 +49,9 @@ app.get("/", (req, res) => {
 });
 
 /**
+ * =========================
  * Application Health
+ * =========================
  */
 app.get("/health", (req, res) => {
   res.status(200).json({
@@ -30,7 +61,9 @@ app.get("/health", (req, res) => {
 });
 
 /**
+ * =========================
  * Database Health
+ * =========================
  */
 app.get(
   "/health/db",
@@ -41,11 +74,13 @@ app.get(
       success: true,
       message: "Database connected 🤖",
     });
-  })
+  }),
 );
 
 /**
+ * =========================
  * 404 - Route Not Found
+ * =========================
  */
 app.use((req, res) => {
   res.status(404).json({
@@ -55,7 +90,9 @@ app.use((req, res) => {
 });
 
 /**
+ * =========================
  * Global Error Handler
+ * =========================
  */
 app.use((err, req, res, next) => {
   console.error("❌ Error:", err);
@@ -63,25 +100,21 @@ app.use((err, req, res, next) => {
   let statusCode = err.statusCode || 500;
   let message = err.message || "Internal server error";
 
-  // Prisma: Record not found
   if (err.code === "P2025") {
     statusCode = 404;
     message = "Requested record not found";
   }
 
-  // Prisma: Unique constraint violation
   if (err.code === "P2002") {
     statusCode = 409;
     message = "A record with this value already exists";
   }
 
-  // Prisma: Foreign key constraint violation
   if (err.code === "P2003") {
     statusCode = 400;
     message = "Invalid foreign key reference";
   }
 
-  // Hide unexpected errors in production
   if (process.env.NODE_ENV === "production" && !err.isOperational) {
     message = "Internal server error";
   }
