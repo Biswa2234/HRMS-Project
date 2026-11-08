@@ -5,8 +5,19 @@ import { prisma } from "./config/database.js";
 import asyncHandler from "./utils/asyncHandler.js";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
-
+import projectRoutes from "./routes/project.routes.js";
+import taskRoutes from "./routes/task.routes.js";
+import leaveRoutes from "./routes/leave.routes.js";
+import commentRoutes from "./routes/comment.routes.js";
+import dashboardRoutes from "./routes/dashboard.routes.js";
+import attendanceRoutes from "./routes/attendance.routes.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger.js";
+import notificationRoutes from "./routes/notification.routes.js";
 const app = express();
+
+// Swagger UI
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 /**
  * =========================
@@ -35,7 +46,13 @@ app.use(express.json());
  */
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-
+app.use("/api/projects", projectRoutes);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/leaves", leaveRoutes);
+app.use("/api/comments", commentRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/attendance", attendanceRoutes);
+app.use("/api/notifications", notificationRoutes);
 /**
  * =========================
  * Root

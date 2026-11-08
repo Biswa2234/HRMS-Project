@@ -17,6 +17,9 @@ const env = {
     process.env.JWT_REFRESH_EXPIRES_IN || "7d",
 
   NODE_ENV: process.env.NODE_ENV || "development",
+  KAFKA_BROKERS: process.env.KAFKA_BROKERS || "localhost:9092",
+
+FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173",
 };
 
 export default env;

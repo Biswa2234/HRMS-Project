@@ -149,7 +149,7 @@ const forgotPassword = async ({ email }) => {
 
   // Generate a new reset token
   const resetToken = generateResetToken();
-
+  console.log("Generated reset token:==============", resetToken);
   // Token expires after 15 minutes
   const expiresAt = new Date();
   expiresAt.setMinutes(expiresAt.getMinutes() + 15);
